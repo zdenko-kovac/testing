@@ -1,0 +1,14 @@
+name: Test Pull Request
+
+on:
+  pull_request:
+    branches:
+    - 'main'
+    paths-ignore:
+    - 'README.md'
+
+jobs:
+  test:
+    runs-on: [self-hosted,Linux]
+    steps:
+    - run: echo "Hello world"
