@@ -11,6 +11,6 @@ on:
 
 jobs:
   test:
-    runs-on: [self-hosted,Linux]
+    runs-on: [Linux]
     steps:
     - run: echo "Hello world"
