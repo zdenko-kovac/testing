@@ -1,0 +1,49 @@
+name: Update README
+
+on:
+  workflow_dispatch:
+    inputs:
+      system_url:
+        description: 'URL of the created system'
+        required: true
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Update README
+        uses: jakejarvis/readme-box@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          box: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Actor</th>
+                  <th>System URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>${{ github.event.created_at }}</td>
+                  <td>${{ github.actor }}</td>
+                  <td><a href="${{ github.event.inputs.system_url }}">${{ github.event.inputs.system_url }}</a></td>
+                </tr>
+              </tbody>
+            </table>
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "actions@github.tools.sap"
+          git config --local user.name "GitHub Actions"
+          git add README.md
+          git commit -m "Update README with new system"
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
