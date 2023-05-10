@@ -10,7 +10,6 @@ on:
 jobs:
   update_readme:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -20,10 +19,6 @@ jobs:
       run: |
         echo ::set-output name=date::$(date +%Y-%m-%d)
         echo ::set-output name=actor::$(github.actor)
-
-    - name: Create system
-      # Your existing steps to create the system here
-      # Remember to output the system URL
 
     - name: Update README
       id: update_readme
