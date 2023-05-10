@@ -1,39 +1,47 @@
-name: Update README
+name: Update README with system information
 
 on:
   workflow_dispatch:
     inputs:
-      system_url:
-        description: 'URL of the created system'
+      system-url:
+        description: 'System URL created by workflow'
         required: true
 
 jobs:
-  update_readme:
+  update-readme:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Get date and actor
-      id: meta
-      run: |
-        echo ::set-output name=date::$(date +%Y-%m-%d)
-        echo ::set-output name=actor::$(github.actor)
-
     - name: Update README
-      id: update_readme
-      uses: peaceiris/actions-md-table@v0.3.2
+      uses: peaceiris/actions-gh-pages@v3
       with:
-        markdown: README.md
-        table: |
-          | Date       | Actor        | System URL      |
-          | ---------- | ------------ | --------------- |
-          | ${{ steps.meta.outputs.date }} | ${{ steps.meta.outputs.actor }} | ${{ steps.create_system.outputs.system_url }} |
+        personal_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        publish_dir: .
+        commit_message: 'Updated system information'
+        commit_user_name: 'GitHub Actions'
+        commit_user_email: 'actions@github.com'
+        keep_files: false
+        allow_empty_commit: true
+        push: false
+        html_dir: .
 
-    - name: Commit changes
+    - name: Update system information in table
       run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "GitHub Actions"
+        table="| Date | Actor | System URL |\\n| --- | --- | --- |\\n| $(date +%Y-%m-%d) | $GITHUB_ACTOR | ${{ github.event.inputs.system-url }} |\\n"
+        sed -i "5i $table" README.md
+
+    - name: Commit updated README
+      run: |
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions"
         git add README.md
-        git commit -m "Update README with new system URL"
-        git push origin HEAD
+        git commit -m "Update system information" -a
+
+    - name: Push changes
+      uses: ad-m/github-push-action@v0.5.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
